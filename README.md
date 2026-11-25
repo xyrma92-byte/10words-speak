@@ -1,2 +1,23 @@
-# 10words-speak
-Personal English speaking practice app (complement to Duolingo). Core words + Speaking Club with characters.
+# 10Words Speak — Практика говорения
+
+Личное приложение для практики английского в дополнение к Duolingo.
+
+## Speaking Club
+Чистая практика разговора с «соперником»:
+- Персонаж говорит (озвучка)
+- Ты пытаешься ответить вслух
+- Показываешь образец и слушаешь, как правильно
+- Переходишь дальше
+
+Сценарии: кафе, аптека, такси, магазин, дорога, отель, врач.
+
+## Базовые слова
+Самые нужные для диалогов: местоимения, вопросы, want/give/need и т.д.
+
+## Запуск
+```bash
+python3 -m http.server 8080
+```
+Открой http://localhost:8080
+
+Или выложи на GitHub Pages.
