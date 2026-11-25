@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0284c7">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="10Words Speak">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="manifest" href="manifest.json">
+  <title>10Words Speak — База + Speaking Club</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <header>
+      <div class="logo">10<span>Words</span> Speak</div>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="words">Базовые слова</button>
+      <button class="tab" data-tab="speak">Speaking Club</button>
+    </nav>
+
+    <!-- Words Tab -->
+    <section id="words-tab" class="tab-content active">
+      <h2>Основные слова для разговора</h2>
+      <p class="subtitle">Местоимения, вопросы, хочу/дай и другие must-know</p>
+      <div class="word-list" id="word-list"></div>
+      <div class="actions">
+        <button class="btn primary" id="learn-btn">Учить</button>
+        <button class="btn secondary" id="quiz-btn">Тест</button>
+      </div>
+    </section>
+
+    <!-- Speaking Club Tab -->
+    <section id="speak-tab" class="tab-content">
+      <h2>Speaking Club</h2>
+      <p class="subtitle">Практикуй живые диалоги от простого к сложному</p>
+      <div class="scenarios" id="scenarios"></div>
+    </section>
+
+    <!-- Learn Modal -->
+    <div class="modal" id="learn-modal">
+      <div class="modal-content">
+        <div class="card">
+          <div class="word-en" id="card-en"></div>
+          <div class="word-ru" id="card-ru" style="display:none"></div>
+          <div class="example" id="card-example" style="display:none"></div>
+        </div>
+        <div class="card-actions">
+          <button class="btn" id="speak-btn">🔊 Произнести</button>
+          <button class="btn" id="show-btn">Показать перевод</button>
+          <button class="btn primary" id="next-card">Далее →</button>
+        </div>
+        <button class="close-btn" id="close-learn">✕</button>
+      </div>
+    </div>
+
+    <!-- Dialogue Modal -->
+    <div class="modal" id="dialogue-modal">
+      <div class="modal-content dialogue">
+        <div class="character">
+          <img id="char-img" src="" alt="character">
+          <div class="char-name" id="char-name"></div>
+        </div>
+        <div class="dialogue-box">
+          <div class="opponent-label">Соперник говорит:</div>
+          <div class="speech" id="speech"></div>
+          <button class="btn secondary small" id="play-opponent">🔊 Послушать соперника</button>
+
+          <div class="your-turn">
+            <div class="task-label">Твоя очередь (говори вслух):</div>
+            <div class="task" id="task"></div>
+            <button class="btn primary" id="show-model">Показать образец</button>
+            <div class="model-answer" id="model-answer" style="display:none"></div>
+            <button class="btn secondary small" id="play-model" style="display:none">🔊 Послушать образец</button>
+          </div>
+          <button class="btn primary" id="next-step">Я сказал → Дальше</button>
+        </div>
+        <button class="close-btn" id="close-dialogue">✕</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(console.error);
+    }
+  </script>
+</body>
+</html>
