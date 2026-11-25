@@ -206,9 +206,10 @@ function renderScenarios() {
   });
 }
 
-// Speaking practice engine
+// Speaking practice engine with speech recognition
 let currentScenario = null;
 let currentStep = 0;
+let recognition = null;
 
 function speak(text) {
   if ('speechSynthesis' in window) {
@@ -218,6 +219,22 @@ function speak(text) {
     utter.rate = 0.95;
     speechSynthesis.speak(utter);
   }
+}
+
+function normalize(text) {
+  return text.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim();
+}
+
+function isCloseEnough(heard, model) {
+  const h = normalize(heard);
+  const m = normalize(model);
+  if (!h) return false;
+  if (h.includes(m) || m.includes(h)) return true;
+  // simple word overlap
+  const hWords = h.split(/\s+/);
+  const mWords = m.split(/\s+/);
+  const common = hWords.filter(w => mWords.includes(w)).length;
+  return common >= Math.min(2, mWords.length * 0.5);
 }
 
 function startDialogue(scenario) {
@@ -230,12 +247,19 @@ function startDialogue(scenario) {
 }
 
 function showStep() {
+  document.getElementById('heard').style.display = 'none';
+  document.getElementById('listen-status').textContent = '';
+  document.getElementById('next-step').style.display = 'none';
+  document.getElementById('mic-btn').classList.remove('listening');
+
   if (currentStep >= currentScenario.steps.length) {
     document.getElementById('speech').textContent = "Отлично! Диалог закончен. Молодец!";
     document.getElementById('task').textContent = "Можешь повторить ещё раз или выбрать другой сценарий.";
     document.getElementById('model-answer').style.display = 'none';
     document.getElementById('play-model').style.display = 'none';
     document.getElementById('show-model').style.display = 'none';
+    document.getElementById('mic-btn').style.display = 'none';
+    document.getElementById('next-step').style.display = 'block';
     document.getElementById('next-step').textContent = 'Закрыть';
     return;
   }
@@ -247,9 +271,9 @@ function showStep() {
   document.getElementById('model-answer').style.display = 'none';
   document.getElementById('play-model').style.display = 'none';
   document.getElementById('show-model').style.display = 'block';
-  document.getElementById('next-step').textContent = 'Я сказал → Дальше';
+  document.getElementById('mic-btn').style.display = 'block';
+  document.getElementById('next-step').textContent = 'Дальше →';
 
-  // Auto-play opponent
   setTimeout(() => speak(step.opponent), 400);
 }
 
@@ -270,6 +294,64 @@ document.getElementById('play-model').addEventListener('click', () => {
   }
 });
 
+// Speech recognition
+document.getElementById('mic-btn').addEventListener('click', () => {
+  if (!currentScenario || currentStep >= currentScenario.steps.length) return;
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    document.getElementById('listen-status').textContent = 'Распознавание речи не поддерживается в этом браузере. Попробуй Chrome.';
+    return;
+  }
+
+  if (recognition) recognition.abort();
+  recognition = new SpeechRecognition();
+  recognition.lang = 'en-US';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  const btn = document.getElementById('mic-btn');
+  const status = document.getElementById('listen-status');
+  const heardEl = document.getElementById('heard');
+
+  btn.classList.add('listening');
+  status.textContent = 'Слушаю... говори сейчас';
+  heardEl.style.display = 'none';
+
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    heardEl.textContent = 'Услышал: "' + transcript + '"';
+    heardEl.style.display = 'block';
+
+    const model = currentScenario.steps[currentStep].model;
+    if (isCloseEnough(transcript, model)) {
+      status.textContent = 'Отлично! Понял. Молодец!';
+      status.style.color = '#10b981';
+      document.getElementById('next-step').style.display = 'block';
+      setTimeout(() => {
+        currentStep++;
+        showStep();
+      }, 900);
+    } else {
+      status.textContent = 'Не совсем понял. Попробуй ещё раз или посмотри образец.';
+      status.style.color = '#f59e0b';
+    }
+    btn.classList.remove('listening');
+  };
+
+  recognition.onerror = () => {
+    status.textContent = 'Не расслышал. Нажми и скажи ещё раз.';
+    status.style.color = '#f59e0b';
+    btn.classList.remove('listening');
+  };
+
+  recognition.onend = () => {
+    btn.classList.remove('listening');
+  };
+
+  recognition.start();
+});
+
 document.getElementById('next-step').addEventListener('click', () => {
   if (currentStep >= currentScenario.steps.length) {
     document.getElementById('dialogue-modal').classList.remove('active');
@@ -282,6 +364,7 @@ document.getElementById('next-step').addEventListener('click', () => {
 document.getElementById('close-dialogue').addEventListener('click', () => {
   document.getElementById('dialogue-modal').classList.remove('active');
   speechSynthesis.cancel();
+  if (recognition) recognition.abort();
 });
 
 // Init

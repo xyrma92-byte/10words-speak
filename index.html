@@ -71,13 +71,16 @@
           <button class="btn secondary small" id="play-opponent">🔊 Послушать соперника</button>
 
           <div class="your-turn">
-            <div class="task-label">Твоя очередь (говори вслух):</div>
+            <div class="task-label">Твоя очередь — говори в микрофон:</div>
             <div class="task" id="task"></div>
-            <button class="btn primary" id="show-model">Показать образец</button>
+            <button class="btn primary mic-btn" id="mic-btn">🎤 Говорить</button>
+            <div class="listen-status" id="listen-status"></div>
+            <div class="heard" id="heard" style="display:none"></div>
+            <button class="btn secondary" id="show-model">Показать образец</button>
             <div class="model-answer" id="model-answer" style="display:none"></div>
             <button class="btn secondary small" id="play-model" style="display:none">🔊 Послушать образец</button>
           </div>
-          <button class="btn primary" id="next-step">Я сказал → Дальше</button>
+          <button class="btn primary" id="next-step" style="display:none">Дальше →</button>
         </div>
         <button class="close-btn" id="close-dialogue">✕</button>
       </div>
